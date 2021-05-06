@@ -1,4 +1,4 @@
-"""Created By Raphael Mulenda (RFM) , start date Sun 24-April-2021"""
+"""Created By Raphael Mulenda (RFM) , start date Sun 24-April-2021, End date 7-May-2021"""
 # import
 import json
 from random import choice, shuffle
@@ -44,23 +44,57 @@ WebSite = StringVar()
 UserName = StringVar()
 Password = StringVar()
 Pass_len = IntVar()
-# ---------------------------- Entry fields Creation------------------------------- #
-website_entry = Entry(data_frame, font=(FONT_NAME, 12, 'bold'), textvariable=WebSite, bd=7, width=22)
-website_entry.grid(column=1, row=0, padx=10, pady=10)
-user_name_entry = Entry(data_frame, font=(FONT_NAME, 12, 'bold'), textvariable=UserName, bd=7, width=22)
-user_name_entry.grid(column=1, row=1, padx=10, pady=5)
-password_length_spinbox = Spinbox(data_frame, from_=8, to=32, font=(FONT_NAME, 12, 'bold'),
-                                  textvariable=Pass_len, bd=5, width=21, relief=GROOVE, justify=CENTER)
-password_length_spinbox.grid(column=1, row=2, padx=10, pady=10)
-password_entry = Entry(data_frame, font=(FONT_NAME, 12, 'bold'), textvariable=Password, bd=7, width=22)
-password_entry.grid(column=1, row=3, padx=10, pady=10)
 
 
 # ---------------------------- FUNCTION------------------------------ #
+def on_entry_clique_web(event):
+    """Function that gets called whenever entry is clicked"""
+    if website_entry.get() == "Enter the website":
+        website_entry.delete(0, 'end')  # delete all the text in the entry
+        website_entry.insert(0, "")  # insert blank for user index
+        website_entry.config(fg='black')
+
+
+def focus_out_web(event):
+    if website_entry.get() == '':
+        website_entry.insert(0, "Enter the website")
+        website_entry.config(fg='grey')
+
+
+def on_entry_clique_email(event):
+    """Function that gets called whenever  email entry is clicked"""
+    if user_name_entry.get() == "Enter your Email/Username":
+        user_name_entry.delete(0, 'end')
+        user_name_entry.insert(0, "")
+        user_name_entry.config(fg='black')
+
+
+def focus_out_email(event):
+    if user_name_entry.get() == '':
+        user_name_entry.insert(0, "Enter your Email/Username")
+        user_name_entry.config(fg='grey')
+
+
+def on_entry_clique_pass(event):
+    """Function that gets called whenever entry is clicked"""
+    if password_entry.get() == "Enter password/Generate":
+        password_entry.delete(0, 'end')  # delete all the text in the entry
+        password_entry.insert(0, "")  # insert blank for user index
+        password_entry.config(fg='black')
+
+
+def focus_out_pass(event):
+    if password_entry.get() == '':
+        password_entry.insert(0, "Enter password/Generate")
+        password_entry.config(fg='grey')
+
+
 def save_data():
     # This function will save the data to a json file that is sued a database and if the file doesnt exist
     # it will create a new one
-    if WebSite.get() != "" and UserName.get() != "" and Password.get() != "":
+    if WebSite.get() != "" and UserName.get() != "" and Password.get() != "" and UserName.get() != \
+            "Enter your Email/Username" and WebSite.get() != "Enter the website" \
+            and Password.get() != "Enter password/Generate":
         new_data = {
             WebSite.get(): {
                 "username": UserName.get(),
@@ -83,18 +117,26 @@ def save_data():
                 json.dump(data, db_json, indent=4, sort_keys=True)
         finally:
             # this part will always run if the first statement is true
-            WebSite.set("")
-            UserName.set("")
-            Password.set("")
+            website_entry.delete(0, 'end')
+            # website_entry.insert(0, "Enter the website")
+            website_entry.config(fg='grey')
+            user_name_entry.delete(0, 'end')
+            # user_name_entry.insert(0, "Enter your Email/Username")
+            user_name_entry.config(fg='grey')
+            password_entry.delete(0, 'end')
+            # password_entry.insert(0, "Enter password/Generate")
+            password_entry.config(fg='grey')
             messagebox.showinfo(title='Data Saved', message="Data saved successfully")
 
         # this part will run if any of the fields is empty
-    elif WebSite.get() == "" or UserName.get() == "" or Password.get() == "":
+    elif WebSite.get() == "" or UserName.get() == "" or Password.get() == "" or UserName.get() == \
+            "Enter your Email/Username" or WebSite.get() == "Enter the website" \
+            or Password.get() == "Enter password/Generate":
         messagebox.showwarning(title='Empty Fields', message="Don't leave any fields blank")
 
 
 def search_data():
-    if WebSite.get() != "":
+    if WebSite.get() != "" or WebSite.get() != "Enter the website":
         # the bellow code will search (iter) the entered website in the database and it will provide a feedback to user
         try:
             with open("database.json", "r") as db_json:
@@ -113,17 +155,17 @@ def search_data():
                 WebSite.set("")
             elif f"{WebSite.get()}" not in data:
                 messagebox.showinfo(title="Not Data Found", message="No details for the website exists")
-    elif WebSite.get() == "":
+    elif WebSite.get() == "" or WebSite.get() == "Enter the website":
         messagebox.showwarning(title='Empty Fields', message="Enter a website!")
 
 
 def copy_pass():
     # This function will copy the password to clipboard
-    if Password.get() != "":
+    if Password.get() != "" and Password.get() != "Enter password/Generate":
         pyperclip.copy(f"{Password.get()}")
         Password.set("")
         messagebox.showinfo(title="Copy to clipboard", message="Password copied to clipboard successfully")
-    elif Password.get() == "":
+    elif Password.get() == "" or Password.get() == "Enter password/Generate":
         messagebox.showinfo(title="Empty Fields", message="The Password fields is empty, generate or enter a "
 
                                                           "password before copy to clipboard")
@@ -166,17 +208,46 @@ def generator():
         pyperclip.copy(password)
 
 
+# ---------------------------- Entry fields Creation------------------------------- #
+website_entry = Entry(data_frame, font=(FONT_NAME, 12, 'bold'), textvariable=WebSite, bd=7, width=23)
+website_entry.insert(0, "Enter the website")
+website_entry.bind('<FocusIn>', on_entry_clique_web)
+website_entry.bind('<FocusOut>', focus_out_web)
+website_entry.config(fg='grey')
+website_entry.grid(column=1, row=0, padx=10, pady=10)
+
+user_name_entry = Entry(data_frame, font=(FONT_NAME, 12, 'bold'), textvariable=UserName, bd=7, width=23)
+user_name_entry.insert(0, "Enter your Email/Username")
+user_name_entry.bind('<FocusIn>', on_entry_clique_email)
+user_name_entry.bind('<FocusOut>', focus_out_email)
+user_name_entry.config(fg='grey')
+user_name_entry.grid(column=1, row=1, padx=10, pady=5)
+
+password_length_spinbox = Spinbox(data_frame, from_=8, to=32, font=(FONT_NAME, 12, 'bold'),
+                                  textvariable=Pass_len, bd=5, width=22, relief=GROOVE, justify=CENTER)
+password_length_spinbox.grid(column=1, row=2, padx=10, pady=10)
+
+password_entry = Entry(data_frame, font=(FONT_NAME, 12, 'bold'), textvariable=Password, bd=7, width=23)
+password_entry.insert(0, "Enter password/Generate")
+password_entry.bind('<FocusIn>', on_entry_clique_pass)
+password_entry.bind('<FocusOut>', focus_out_pass)
+password_entry.config(fg='grey')
+password_entry.grid(column=1, row=3, padx=10, pady=10)
+
 # ---------------------------- Button Creation------------------------------- #
 
 search_btn = Button(data_frame, bd=5, font=(FONT_NAME, 10, 'bold'), text="Search", width=14, bg=Light_Green,
                     command=search_data)
 search_btn.grid(column=2, row=0, padx=10)
+
 save_btn = Button(data_frame, bd=5, font=(FONT_NAME, 10, 'bold'), text="Save Data", width=14, bg=Light_Green,
                   command=save_data)
 save_btn.grid(column=2, row=1, padx=5)
+
 generate_btn = Button(data_frame, bd=5, font=(FONT_NAME, 10, 'bold'), text="Generate Password", width=14,
                       bg=Light_Green, command=generator)
 generate_btn.grid(column=2, row=2, padx=5)
+
 copy_pass_btn = Button(data_frame, bd=5, font=(FONT_NAME, 10, 'bold'), text="Copy Password", width=14, bg=Light_Green,
                        command=copy_pass)
 copy_pass_btn.grid(column=2, row=3, padx=5)
